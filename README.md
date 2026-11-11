@@ -17,6 +17,8 @@
 | [`docs/standard.md`](docs/standard.md) | 规范正文：必需 5 条（R1–R5）、推荐 5 条（W1–W5）、目录职责表、写作与提交约定 |
 | [`scripts/check-layout.sh`](scripts/check-layout.sh) | 检查器：对任一仓库运行，必需项缺失时退出码非 0 |
 | [`tests/test-layout.sh`](tests/test-layout.sh) | 检查器自身的回归测试，用临时 fixture 覆盖每条必需规则 |
+| [`templates/`](templates/README.md) | 两个骨架：`script-project/`（脚本工具）、`pkgbuild-project/`（Arch 打包） |
+| [`docs/migration.md`](docs/migration.md) | 逐仓库迁移清单与进度 |
 | [`docs/proposal.md`](docs/proposal.md) | 需求提案：现状盘点、目标、方法、交付物与验收标准 |
 
 ## 用法

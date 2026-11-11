@@ -1,0 +1,17 @@
+# makepkg 工作目录与产物
+src/
+pkg/
+*.pkg.tar.zst
+*.pkg.tar.zst.sig
+
+# 下载的源码包（PKGBUILD 的 source 会自动下载）
+*.tar.xz
+*.tar.gz
+*.tar.bz2
+*.tar.zst
+
+# 编辑器 / 系统
+.vscode/
+.idea/
+*.swp
+.DS_Store

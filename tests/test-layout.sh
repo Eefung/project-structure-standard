@@ -115,5 +115,10 @@ d=$(new_fixture readme-sections)
 grep -v '^## 验证' "$d/README.md" >"$d/README.tmp" && mv "$d/README.tmp" "$d/README.md"
 run_case 'README 缺验证小节必须失败' 1 '验证' "$d"
 
+d=$(new_fixture nested-handoff)
+mkdir -p "$d/templates/thing/docs"
+printf '# handoff\n' >"$d/templates/thing/docs/handoff.md"
+run_case '嵌套在模板里的 handoff 不算违规' 0 '全部通过' "$d"
+
 printf '\n== 结果：%d 通过，%d 失败\n' "$pass" "$fail"
 ((fail == 0)) && exit 0 || exit 1

@@ -67,7 +67,7 @@
 ### R4 `docs/` 命名与交接文档位置
 
 - **命名**：`docs/`（含一级子目录）下的 `.md` 一律小写 kebab-case，正则 `^[a-z0-9]+(-[a-z0-9]+)*\.md$`。理由：大小写混用在 Linux 上不会报错，但检索、补全、按字母排序时分裂成两组。
-- **交接文档**：任何 `handoff*.md` 必须在 `docs/handoff.md`。
+- **交接文档**：仓库根与 `docs/` 两层内的任何 `handoff*.md` 必须是 `docs/handoff.md`（模板、示例目录里嵌套的不算——`templates/` 下自带一份骨架是正常的）。
 - **为什么**：同类文档固定位置，才能用一条 `find` 找全所有仓库的当前状态；位置不固定时，「接手」这件事只能靠记忆。
 - **违反后果**：`magpie-repo` 的 `HANDOFF.md` 在根目录，`tui-mode-recovery` 的 `handoff.md` 在 `docs/` 下——同一类文档两种约定，跨仓库检索必然漏。
 - **检查**：文件名正则 + `find -iname 'handoff*.md'`。

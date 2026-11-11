@@ -1,0 +1,26 @@
+# Maintainer: {{名字}} <{{邮箱}}>
+
+pkgname={{包名}}
+pkgver=0.0.0
+pkgrel=1
+pkgdesc='{{一句话描述，不要用中文标点包住包名}}'
+arch=('x86_64')
+url='https://github.com/Eefung/{{包名}}'
+license=('MIT')
+depends=()
+makedepends=()
+source=("$pkgname-$pkgver.tar.gz::$url/archive/v$pkgver.tar.gz")
+# 占位: 拿到上游源码后跑 `updpkgsums` 换成真实校验和
+sha256sums=('SKIP')
+
+build() {
+  cd "$srcdir/$pkgname-$pkgver"
+  # ./configure --prefix=/usr
+  # make
+}
+
+package() {
+  cd "$srcdir/$pkgname-$pkgver"
+  # make DESTDIR="$pkgdir" install
+  install -Dm644 /dev/null "$pkgdir/usr/share/doc/$pkgname/README"
+}

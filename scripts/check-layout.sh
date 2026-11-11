@@ -139,7 +139,7 @@ if [[ -d $repo/docs ]]; then
     if [[ $rel != docs/handoff.md ]]; then
       bad "R4 交接文档位置不合规：$rel（应为 docs/handoff.md）"
     fi
-  done < <(find "$repo" -iname 'handoff*.md' -not -path '*/.git/*' -not -path '*/node_modules/*' | sort)
+  done < <(find "$repo" -maxdepth 2 -iname 'handoff*.md' -not -path '*/.git/*' | sort)
 else
   ok 'R4 无 docs/ 目录（未触发文档命名规则）'
 fi
