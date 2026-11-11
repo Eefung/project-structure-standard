@@ -22,15 +22,15 @@ new_fixture() {
   local dir=$tmp/$1
   mkdir -p "$dir/docs"
   cat >"$dir/README.md" <<'MD'
-# fixture
+# Fixture Tool
 
-演示用 fixture：说明它解决什么问题。
+A tiny fixture used by the layout checker's tests.
 
 ## How it works
 
-什么都不做。
+Nothing at all.
 
-## Install
+## Installation
 
 ```sh
 ./run.sh
@@ -44,9 +44,53 @@ new_fixture() {
 
 ## Documentation
 
-见 `docs/note.md`。
+See `docs/note.md`.
 
 ## License
+
+MIT.
+MD
+  printf '#!/bin/sh\nexit 0\n' >"$dir/run.sh"
+  chmod +x "$dir/run.sh"
+  printf 'MIT\n' >"$dir/LICENSE"
+  printf '*.tar.xz\n' >"$dir/.gitignore"
+  printf '# note\n' >"$dir/docs/note.md"
+  git -C "$dir" init -q
+  git -C "$dir" add -A
+  git -C "$dir" -c user.name=t -c user.email=t@example.com commit -qm 'feat: fixture'
+  printf '%s\n' "$dir"
+}
+
+# 中文 fixture：中文标题 + 中文正文
+new_fixture_cn() {
+  local dir=$tmp/$1
+  mkdir -p "$dir/docs"
+  cat >"$dir/README.md" <<'MD'
+# 示例工具
+
+一个用来测布局检查器的中文 fixture。
+
+## 工作原理
+
+什么都不做。
+
+## 安装
+
+```sh
+./run.sh
+```
+
+## 用法
+
+```sh
+./run.sh
+```
+
+## 文档
+
+见 `docs/note.md`。
+
+## 许可
 
 MIT。
 MD
@@ -65,6 +109,21 @@ MD
 run_case() {
   local name=$1 want=$2 pattern=$3 dir=$4 out code
   out=$("$checker" --quiet "$dir" 2>&1)
+  code=$?
+  if [[ $code -eq $want ]] && grep -qF -- "$pattern" <<<"$out"; then
+    printf '  ✓ %s\n' "$name"
+    pass=$((pass + 1))
+  else
+    printf '  ✗ %s（期望 exit=%s 且输出含「%s」，实得 exit=%s）\n' "$name" "$want" "$pattern" "$code"
+    printf '%s\n' "$out" | sed 's/^/      /'
+    fail=$((fail + 1))
+  fi
+}
+
+# 同 run_case，但不用 --quiet，用于断言告警文案
+run_case_v() {
+  local name=$1 want=$2 pattern=$3 dir=$4 out code
+  out=$("$checker" "$dir" 2>&1)
   code=$?
   if [[ $code -eq $want ]] && grep -qF -- "$pattern" <<<"$out"; then
     printf '  ✓ %s\n' "$name"
@@ -124,21 +183,44 @@ sed '1d' "$d/README.md" >"$d/README.tmp" && mv "$d/README.tmp" "$d/README.md"
 run_case '缺一级标题必须失败' 1 '一级标题' "$d"
 
 d=$(new_fixture no-overview)
-grep -v '^演示用 fixture' "$d/README.md" >"$d/README.tmp" && mv "$d/README.tmp" "$d/README.md"
+grep -v '^A tiny fixture' "$d/README.md" >"$d/README.tmp" && mv "$d/README.tmp" "$d/README.md"
 run_case 'H1 下无简介必须失败' 1 '简介' "$d"
 
 d=$(new_fixture bad-order)
-sed -e 's/^## Install$/## SWAP/' -e 's/^## Usage$/## Install/' -e 's/^## SWAP$/## Usage/' \
+sed -e 's/^## Installation$/## SWAP/' -e 's/^## Usage$/## Installation/' -e 's/^## SWAP$/## Usage/' \
     "$d/README.md" >"$d/README.tmp" && mv "$d/README.tmp" "$d/README.md"
 run_case '章节顺序错乱必须失败' 1 '顺序' "$d"
 
 d=$(new_fixture license-not-last)
-printf '\n## Appendix\n\n附录。\n' >>"$d/README.md"
+printf '\n## Appendix\n\nAppendix text.\n' >>"$d/README.md"
 run_case 'License 之后还有小节必须失败' 1 '最后一节' "$d"
 
 d=$(new_fixture extra-section)
-sed -i '/^## License/i ## Troubleshooting\n\n排障。\n' "$d/README.md"
+sed -i '/^## License/i ## Troubleshooting\n\nTroubleshooting notes.\n' "$d/README.md"
 run_case '规范外的二级标题只告警，不阻塞' 0 '全部通过' "$d"
+
+d=$(new_fixture_cn cn-ok)
+run_case '中文文档用中文标题应通过' 0 '全部通过' "$d"
+
+d=$(new_fixture_cn cn-en-headings)
+sed -i -e 's/^## 工作原理$/## How it works/' -e 's/^## 安装$/## Installation/' \
+       -e 's/^## 用法$/## Usage/' -e 's/^## 文档$/## Documentation/' -e 's/^## 许可$/## License/' \
+       "$d/README.md"
+run_case '中文正文配英文标题必须失败' 1 '中文标题' "$d"
+
+d=$(new_fixture en-cn-headings)
+sed -i -e 's/^## How it works$/## 工作原理/' -e 's/^## Installation$/## 安装/' \
+       -e 's/^## Usage$/## 用法/' -e 's/^## Documentation$/## 文档/' -e 's/^## License$/## 许可/' \
+       "$d/README.md"
+run_case '英文正文配中文标题必须失败' 1 '英文标题' "$d"
+
+d=$(new_fixture slug-title)
+sed -i '1s/.*/# fixture-repo/' "$d/README.md"
+run_case 'H1 用仓库 slug 必须失败' 1 'slug' "$d"
+
+d=$(new_fixture install-short)
+sed -i 's/^## Installation$/## Install/' "$d/README.md"
+run_case_v 'Install 可接受但提示改用 Installation' 0 'Installation' "$d"
 
 d=$(new_fixture nested-handoff)
 mkdir -p "$d/templates/thing/docs"

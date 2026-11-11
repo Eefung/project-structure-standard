@@ -59,16 +59,22 @@ else
 fi
 
 # ---------------------------------------------------------------------------
-# R2 README 六段结构：H1+简介 → Features|How it works → Install|Installation
-#    → Usage|Quick start|Getting Started → Documentation → License
+# R2 README 六段结构：H1（自然语言项目名）+ 简介 → Features|How it works →
+#    Installation → Usage → Documentation → License。标题语言随正文语言。
 # ---------------------------------------------------------------------------
 readme=$repo/README.md
 if [[ ! -s $readme ]]; then
   bad 'R2 缺少 README.md'
 else
   first=$(grep -m1 -vE '^[[:space:]]*$' "$readme" || true)
-  if [[ $first =~ ^#[[:space:]]+[^#] ]]; then
-    ok 'R2 首行是一级标题'
+  if [[ $first =~ ^#[[:space:]]+(.+)$ ]]; then
+    h1=${BASH_REMATCH[1]}
+    h1=${h1%"${h1##*[![:space:]]}"}
+    if [[ $h1 =~ ^[A-Za-z0-9]+([-_.][A-Za-z0-9]+)+$ ]]; then
+      bad "R2 一级标题是仓库 slug（$h1），请写自然语言项目名"
+    else
+      ok 'R2 一级标题是自然语言项目名'
+    fi
   else
     bad 'R2 首行不是一级标题（# 项目名）'
   fi
@@ -79,6 +85,32 @@ else
     ok 'R2 一级标题下有简介'
   else
     bad 'R2 一级标题下没有简介文字（H1 与第一个二级标题之间）'
+  fi
+
+  # 正文语言：非标题行里汉字行占比 ≥20% 按中文文档判定，标题必须同语言
+  # （逐行占比而非「出现即中文」，避免英文文档引用一两句中文输出就被判成中文）
+  cn_lines=$(grep -vE '^#{1,6}[[:space:]]' "$readme" | grep -cP '\p{Han}' || true)
+  body_lines=$(grep -vE '^#{1,6}[[:space:]]' "$readme" | grep -c '[^[:space:]]' || true)
+  if ((body_lines > 0 && cn_lines * 5 >= body_lines)); then
+    doclang=cn
+    names=('功能|工作原理' '安装' '用法|快速开始' '文档' '许可')
+    res=('^(功能|工作原理)[[:space:]]*[:：]?$'
+         '^安装[[:space:]]*[:：]?$'
+         '^(用法|快速开始|开始使用)[[:space:]]*[:：]?$'
+         '^文档[[:space:]]*[:：]?$'
+         '^(许可|版权)[[:space:]]*[:：]?$')
+    optional='^(贡献|社区|致谢)[[:space:]]*[:：]?$'
+    hint='中文正文应配中文标题：功能／工作原理、安装、用法、文档、许可'
+  else
+    doclang=en
+    names=('Features|How it works' 'Installation' 'Usage|Quick start|Getting Started' 'Documentation' 'License')
+    res=('^(features|how it works)[[:space:]]*[:：]?$'
+         '^(installation|install)[[:space:]]*[:：]?$'
+         '^(usage|quick start|getting started)[[:space:]]*[:：]?$'
+         '^documentation[[:space:]]*[:：]?$'
+         '^licen[cs]e[[:space:]]*[:：]?$')
+    optional='^(contributing|contributors|community|acknowledgements?)[[:space:]]*[:：]?$'
+    hint='英文正文应配英文标题：Features|How it works、Installation、Usage、Documentation、License'
   fi
 
   mapfile -t h2 < <(grep -E '^##[[:space:]]' "$readme" \
@@ -95,13 +127,6 @@ else
     return 1
   }
 
-  names=('Features|How it works' 'Install|Installation' 'Usage|Quick start|Getting Started' 'Documentation' 'License')
-  res=('^(features|how it works)[[:space:]]*[:：]?$'
-       '^(install|installation)[[:space:]]*[:：]?$'
-       '^(usage|quick start|getting started)[[:space:]]*[:：]?$'
-       '^documentation[[:space:]]*[:：]?$'
-       '^licen[cs]e[[:space:]]*[:：]?$')
-
   missing=""
   order_bad=0
   prev=-1
@@ -117,19 +142,23 @@ else
   done
 
   if [[ -n $missing ]]; then
-    bad "R2 README 缺少小节:$missing"
+    bad "R2 README 缺少小节:$missing（$hint）"
   elif ((order_bad)); then
-    bad 'R2 二级标题顺序不对（应为 Features|How it works → Install → Usage → Documentation → License）'
+    bad "R2 二级标题顺序不对（应为 ${names[0]} → ${names[1]} → ${names[2]} → ${names[3]} → ${names[4]}）"
   elif ((last != ${#lc[@]} - 1)); then
-    bad "R2 License 必须是最后一节，其后还有：${h2[$((last + 1))]}"
+    bad "R2 ${names[4]} 必须是最后一节，其后还有：${h2[$((last + 1))]}"
   else
     ok 'R2 README 六段结构完整且顺序正确'
+  fi
+
+  if [[ $doclang == en ]] && ! idx_of '^installation[[:space:]]*[:：]?$' >/dev/null; then
+    warn 'R2 建议用 Installation 而不是 Install（与 Usage、Documentation 同为名词）'
   fi
 
   extra=""
   for i in "${!h2[@]}"; do
     hit=0
-    for re in "${res[@]}" '^(contributing|contributors|community)[[:space:]]*[:：]?$'; do
+    for re in "${res[@]}" "$optional"; do
       # shellcheck disable=SC2053
       [[ ${lc[$i]} =~ $re ]] && { hit=1; break; }
     done
