@@ -1,0 +1,41 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: shellcheck
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq shellcheck
+          shellcheck -S warning \
+            scripts/check-layout.sh \
+            tests/test-layout.sh \
+            templates/script-project/install.sh \
+            templates/script-project/tests/run-tests.sh \
+            templates/pkgbuild-project/build.sh \
+            templates/pkgbuild-project/tests/smoke.sh
+
+      - name: 检查器回归测试
+        run: tests/test-layout.sh
+
+      - name: 本仓库自查
+        run: ./scripts/check-layout.sh .
+
+      - name: 两个模板起手即合规
+        run: |
+          set -eu
+          wd=$(mktemp -d)
+          for t in script-project pkgbuild-project; do
+            cp -r "templates/$t" "$wd/$t"
+            git -C "$wd/$t" init -q
+            git -C "$wd/$t" add -A
+            git -C "$wd/$t" -c user.name=ci -c user.email=ci@example.com commit -qm 'feat: 从模板起手'
+            ./scripts/check-layout.sh "$wd/$t"
+          done

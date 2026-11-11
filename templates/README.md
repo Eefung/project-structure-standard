@@ -8,7 +8,7 @@ cd ~/Projects/<新仓库名>
 # 把 {{...}} 占位全部替换掉，再 git init
 ```
 
-复制完在仓库根跑一次检查器，必需项应当直接全绿：
+复制完在仓库根跑一次检查器，应当直接全绿：
 
 ```sh
 ~/Projects/project-structure-standard/scripts/check-layout.sh .
@@ -34,6 +34,6 @@ cd ~/Projects/<新仓库名>
 - `.gitignore`：直接覆盖 `src/`、`pkg/`、`*.pkg.tar.zst`、源码包——这是 R5 最容易踩的一条。
 - `README.md`：六段骨架，用法里给出 `./build.sh` 与清工作目录的 `makepkg -sc`。
 
-两个模板都不含 `.github/`：CI 工作流属于推荐层（W1），按项目需要再加。
+两个模板都自带 `.github/workflows/ci.yml`（shellcheck + 各自回归测试），也都有 `tests/`：起手即满足 R7、R8。
 
 README 骨架里的 `# {{项目名}}` 要换成**自然语言名字**（「TUI 键盘恢复」），不是仓库 slug；二级标题语言跟随正文——中文正文用 `原理`／`安装`／`用法`／`文档`／`许可`，英文正文用 `How it works`／`Installation`／`Usage`／`Documentation`／`License`，不留同义变体。

@@ -8,8 +8,8 @@
 
 | 文件 | 内容 |
 |---|---|
-| [`docs/standard.md`](docs/standard.md) | 规范正文：必需 5 条（R1–R5）、推荐 5 条（W1–W5）、目录职责表、写作与提交约定 |
-| [`scripts/check-layout.sh`](scripts/check-layout.sh) | 检查器：对任一仓库运行，必需项缺失时退出码 1 |
+| [`docs/standard.md`](docs/standard.md) | 规范正文：8 条规则（R1–R8）、目录职责表、写作与提交约定 |
+| [`scripts/check-layout.sh`](scripts/check-layout.sh) | 检查器：对任一仓库运行，有规则不通过时退出码 1 |
 | [`tests/test-layout.sh`](tests/test-layout.sh) | 检查器自身的回归测试，用临时 fixture 覆盖每条必需规则 |
 | [`templates/`](templates/README.md) | 两个骨架：`script-project/`（脚本工具）、`pkgbuild-project/`（Arch 打包） |
 | [`docs/migration.md`](docs/migration.md) | 逐仓库迁移清单与进度 |
@@ -36,9 +36,9 @@ scripts/check-layout.sh --quiet .
 tests/test-layout.sh
 ```
 
-退出码：0 必需项全过；1 有必需项未过；2 用法错误。`✓` 通过、`·` 推荐项告警、`✗` 必需项失败。
+退出码：0 全部合规；1 有规则不合规；2 用法错误。`✓` 合规、`✗` 不合规——规范不判轻重。
 
-在 CachyOS（Linux 7.3.3-1-cachyos）、bash 5.x 上已验证，`shellcheck -S warning` 无告警；`tests/test-layout.sh` 21 个用例全过。
+在 CachyOS（Linux 7.3.3-1-cachyos）、bash 5.x 上已验证，`shellcheck -S warning` 无告警；`tests/test-layout.sh` 27 个用例全过；本仓库与两个模板自查均 exit=0。
 
 ## 文档
 

@@ -2,7 +2,7 @@
 #
 # test-layout.sh — check-layout.sh 的回归测试
 #
-# 每个用例在临时目录里造一个 fixture 仓库，改一处让它违规，
+# 每个用例在临时目录里造一个合规 fixture 仓库，改一处让它违规，
 # 断言检查器给出预期退出码与提示。全部在 mktemp -d 下进行，结束后清理。
 #
 # 用法：tests/test-layout.sh
@@ -17,10 +17,10 @@ trap 'rm -rf "$tmp"' EXIT
 pass=0
 fail=0
 
-# 造一个满足全部必需项的 fixture；$1 为子目录名
+# 造一个满足全部规则的 fixture；$1 为子目录名
 new_fixture() {
   local dir=$tmp/$1
-  mkdir -p "$dir/docs"
+  mkdir -p "$dir/docs" "$dir/tests" "$dir/.github/workflows"
   cat >"$dir/README.md" <<'MD'
 # Fixture Tool
 
@@ -51,7 +51,9 @@ See `docs/note.md`.
 MIT.
 MD
   printf '#!/bin/sh\nexit 0\n' >"$dir/run.sh"
-  chmod +x "$dir/run.sh"
+  printf '#!/bin/sh\nexit 0\n' >"$dir/tests/smoke.sh"
+  printf 'name: ci\non: [push]\njobs: {}\n' >"$dir/.github/workflows/ci.yml"
+  chmod +x "$dir/run.sh" "$dir/tests/smoke.sh"
   printf 'MIT\n' >"$dir/LICENSE"
   printf '*.tar.xz\n' >"$dir/.gitignore"
   printf '# note\n' >"$dir/docs/note.md"
@@ -64,7 +66,7 @@ MD
 # 中文 fixture：中文标题 + 中文正文
 new_fixture_cn() {
   local dir=$tmp/$1
-  mkdir -p "$dir/docs"
+  mkdir -p "$dir/docs" "$dir/tests" "$dir/.github/workflows"
   cat >"$dir/README.md" <<'MD'
 # 示例工具
 
@@ -95,7 +97,9 @@ new_fixture_cn() {
 MIT。
 MD
   printf '#!/bin/sh\nexit 0\n' >"$dir/run.sh"
-  chmod +x "$dir/run.sh"
+  printf '#!/bin/sh\nexit 0\n' >"$dir/tests/smoke.sh"
+  printf 'name: ci\non: [push]\njobs: {}\n' >"$dir/.github/workflows/ci.yml"
+  chmod +x "$dir/run.sh" "$dir/tests/smoke.sh"
   printf 'MIT\n' >"$dir/LICENSE"
   printf '*.tar.xz\n' >"$dir/.gitignore"
   printf '# note\n' >"$dir/docs/note.md"
@@ -109,21 +113,6 @@ MD
 run_case() {
   local name=$1 want=$2 pattern=$3 dir=$4 out code
   out=$("$checker" --quiet "$dir" 2>&1)
-  code=$?
-  if [[ $code -eq $want ]] && grep -qF -- "$pattern" <<<"$out"; then
-    printf '  ✓ %s\n' "$name"
-    pass=$((pass + 1))
-  else
-    printf '  ✗ %s（期望 exit=%s 且输出含「%s」，实得 exit=%s）\n' "$name" "$want" "$pattern" "$code"
-    printf '%s\n' "$out" | sed 's/^/      /'
-    fail=$((fail + 1))
-  fi
-}
-
-# 同 run_case，但不用 --quiet，用于断言告警文案
-run_case_v() {
-  local name=$1 want=$2 pattern=$3 dir=$4 out code
-  out=$("$checker" "$dir" 2>&1)
   code=$?
   if [[ $code -eq $want ]] && grep -qF -- "$pattern" <<<"$out"; then
     printf '  ✓ %s\n' "$name"
@@ -172,7 +161,7 @@ run_case '产物已入库必须失败' 1 '已入库' "$d"
 
 d=$(new_fixture ignored-artifact)
 printf 'x' >"$d/payload.tar.xz"        # *.tar.xz 已被 .gitignore 覆盖
-run_case '已忽略的产物只告警，不阻塞' 0 '全部通过' "$d"
+run_case '已忽略的产物合规' 0 '全部通过' "$d"
 
 d=$(new_fixture readme-sections)
 grep -v '^## Documentation' "$d/README.md" >"$d/README.tmp" && mv "$d/README.tmp" "$d/README.md"
@@ -197,7 +186,20 @@ run_case 'License 之后还有小节必须失败' 1 '最后一节' "$d"
 
 d=$(new_fixture extra-section)
 sed -i '/^## License/i ## Troubleshooting\n\nTroubleshooting notes.\n' "$d/README.md"
-run_case '规范外的二级标题只告警，不阻塞' 0 '全部通过' "$d"
+run_case '规范外的二级标题必须失败' 1 '规范外' "$d"
+
+d=$(new_fixture no-ci)
+rm -rf "$d/.github"
+run_case '缺 CI 工作流必须失败' 1 'R7' "$d"
+
+d=$(new_fixture no-tests)
+rm -rf "$d/tests"
+run_case '缺 tests/ 必须失败' 1 'R8' "$d"
+
+d=$(new_fixture unknown-dir)
+mkdir -p "$d/weird"
+printf 'MIT\n' >"$d/weird/x"
+run_case '一级目录未登记必须失败' 1 'R6' "$d"
 
 d=$(new_fixture_cn cn-ok)
 run_case '中文文档用中文标题应通过' 0 '全部通过' "$d"
@@ -217,7 +219,7 @@ sed -i 's/^## 用法$/## 快速开始/' "$d/README.md"
 run_case '中文标题写「快速开始」必须失败' 1 '缺少小节' "$d"
 
 d=$(new_fixture en-cn-headings)
-sed -i -e 's/^## How it works$/## 工作原理/' -e 's/^## Installation$/## 安装/' \
+sed -i -e 's/^## How it works$/## 原理/' -e 's/^## Installation$/## 安装/' \
        -e 's/^## Usage$/## 用法/' -e 's/^## Documentation$/## 文档/' -e 's/^## License$/## 许可/' \
        "$d/README.md"
 run_case '英文正文配中文标题必须失败' 1 '英文标题' "$d"
@@ -228,7 +230,11 @@ run_case 'H1 用仓库 slug 必须失败' 1 'slug' "$d"
 
 d=$(new_fixture install-short)
 sed -i 's/^## Installation$/## Install/' "$d/README.md"
-run_case_v 'Install 可接受但提示改用 Installation' 0 'Installation' "$d"
+run_case 'Install 必须失败（只认 Installation）' 1 'Installation' "$d"
+
+d=$(new_fixture license-spelling)
+sed -i 's/^## License$/## Licence/' "$d/README.md"
+run_case 'Licence 拼写必须失败（只认 License）' 1 '缺少小节' "$d"
 
 d=$(new_fixture nested-handoff)
 mkdir -p "$d/templates/thing/docs"

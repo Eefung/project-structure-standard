@@ -10,11 +10,11 @@
 #   -h, --help    显示本帮助
 #
 # 退出码：
-#   0  必需项全部通过（推荐项可能仍有告警）
-#   1  有必需项未通过
+#   0  全部规则通过
+#   1  有规则未通过
 #   2  用法错误
 #
-# 判定口径见 docs/standard.md。规则只在「能由脚本判定」时才进入必需层。
+# 判定口径见 docs/standard.md：只判合规与否，不判轻重。
 
 set -uo pipefail
 
@@ -40,11 +40,9 @@ fi
 repo=$(cd "$repo_arg" && pwd)
 
 fails=0
-warns=0
 
 ok()   { ((QUIET)) || printf '  ✓ %s\n' "$*"; }
 bad()  { fails=$((fails + 1)); printf '  ✗ %s\n' "$*"; }
-warn() { warns=$((warns + 1)); ((QUIET)) || printf '  · %s\n' "$*"; }
 detail() { ((QUIET)) || printf '      %s\n' "$*"; }
 
 printf '== check-layout: %s\n' "$repo"
@@ -105,10 +103,10 @@ else
     doclang=en
     names=('Features|How it works' 'Installation' 'Usage' 'Documentation' 'License')
     res=('^(features|how it works)[[:space:]]*[:：]?$'
-         '^(installation|install)[[:space:]]*[:：]?$'
+         '^installation[[:space:]]*[:：]?$'
          '^usage[[:space:]]*[:：]?$'
          '^documentation[[:space:]]*[:：]?$'
-         '^licen[cs]e[[:space:]]*[:：]?$')
+         '^license[[:space:]]*[:：]?$')
     optional='^(contributing|contributors|community|acknowledgements?)[[:space:]]*[:：]?$'
     hint='英文正文应配英文标题：Features|How it works、Installation、Usage、Documentation、License'
   fi
@@ -151,8 +149,8 @@ else
     ok 'R2 README 六段结构完整且顺序正确'
   fi
 
-  if [[ $doclang == en ]] && ! idx_of '^installation[[:space:]]*[:：]?$' >/dev/null; then
-    warn 'R2 建议用 Installation 而不是 Install（与 Usage、Documentation 同为名词）'
+  if [[ $doclang == en ]] && [[ -n $(idx_of '^install[[:space:]]*[:：]?$') ]]; then
+    bad 'R2 标题必须是 Installation，不是 Install'
   fi
 
   extra=""
@@ -164,7 +162,7 @@ else
     done
     ((hit)) || extra+="${h2[$i]}、"
   done
-  [[ -n $extra ]] && warn "R2 规范外的二级标题：${extra%、}（不计入失败，内容宜沉到 docs/）"
+  [[ -n $extra ]] && bad "R2 规范外的二级标题：${extra%、}"
 fi
 
 # ---------------------------------------------------------------------------
@@ -259,7 +257,7 @@ if ((in_git)); then
     ok 'R5 无构建产物入库'
   fi
 else
-  warn 'R5 不是 git 仓库，跳过入库检查'
+  bad 'R5 不是 git 仓库，无法判定产物是否入库'
 fi
 
 declare -A leak_locs=() ignored_locs=()
@@ -282,79 +280,46 @@ done < <(
 )
 if ((${#leak_locs[@]} == 0 && ${#ignored_locs[@]} == 0)); then
   ok 'R5 工作区无构建产物'
-elif ((${#ignored_locs[@]} > 0)); then
-  warn "R5 工作区留有已忽略的产物（${!ignored_locs[*]}），建议移到仓库外；属整洁性问题，不阻塞"
-fi
-
-printf '\n-- 推荐项（不阻塞，按需补齐）\n'
-
-# ---------------------------------------------------------------------------
-# W1 CI 工作流
-# ---------------------------------------------------------------------------
-if compgen -G "$repo/.github/workflows/*.y*ml" >/dev/null; then
-  ok 'W1 存在 CI 工作流'
-else
-  warn 'W1 无 .github/workflows/，改动无法自动验证'
+elif ((${#leak_locs[@]} == 0)); then
+  ok "R5 工作区产物均已被忽略（${!ignored_locs[*]}）"
 fi
 
 # ---------------------------------------------------------------------------
-# W2 已验证环境（六段结构下没有独立小节，写在正文或 docs/ 里即可）
-# ---------------------------------------------------------------------------
-if grep -Eiq '已验证|tested on|verified (on|with)|环境要求' "$readme" 2>/dev/null \
-   || grep -rEiq '已验证|tested on|verified (on|with)' "$repo/docs" 2>/dev/null; then
-  ok 'W2 README 或 docs/ 记录了已验证环境'
-else
-  warn 'W2 README 与 docs/ 都未记录已验证环境'
-fi
-
-# ---------------------------------------------------------------------------
-# W3 tests/
-# ---------------------------------------------------------------------------
-if [[ -d $repo/tests ]] && compgen -G "$repo/tests/*" >/dev/null; then
-  ok 'W3 存在 tests/'
-else
-  warn 'W3 无 tests/（不可测试的项目应在 README 说明原因）'
-fi
-
-# ---------------------------------------------------------------------------
-# W4 一级目录在职责表内
+# R6 一级目录在职责表内，或在 README 登记过
 # ---------------------------------------------------------------------------
 known_dirs=" bin lib functions tools scripts templates packages files docs tests src pkg build "
 unknown=""
 while IFS= read -r d; do
   name=$(basename "$d")
-  [[ $name == .git || $name == .github ]] && continue
   [[ $name == __pycache__ || $name == node_modules ]] && continue
-  if [[ $known_dirs != *" $name "* ]]; then
-    if ! grep -qF "$name/" "$readme" 2>/dev/null; then
-      unknown+=" $name/"
-    fi
+  if [[ $known_dirs != *" $name "* ]] && ! grep -qF "$name/" "$readme" 2>/dev/null; then
+    unknown+=" $name/"
   fi
 done < <(find "$repo" -maxdepth 1 -mindepth 1 -type d ! -name '.*' | sort)
 if [[ -z $unknown ]]; then
-  ok 'W4 一级目录均在职责表内或已在 README 登记'
+  ok 'R6 一级目录均在职责表内或已在 README 登记'
 else
-  warn "W4 目录未在职责表内且 README 未说明：$unknown"
+  bad "R6 目录不在职责表内且 README 未登记：$unknown"
 fi
 
 # ---------------------------------------------------------------------------
-# W5 约定式提交
+# R7 CI 工作流
 # ---------------------------------------------------------------------------
-if ((in_git)); then
-  total=0
-  conform=0
-  while IFS= read -r subj; do
-    total=$((total + 1))
-    [[ $subj =~ ^(feat|fix|docs|ci|chore|refactor|test|build|perf|style|revert)(\([^\)]+\))?!?:\ .+ ]] && conform=$((conform + 1))
-  done < <(git -C "$repo" log -20 --pretty=%s 2>/dev/null)
-  if ((total > 0 && conform == total)); then
-    ok "W5 最近 $total 条提交均符合约定式提交"
-  elif ((total > 0)); then
-    warn "W5 最近 $total 条提交中 $((total - conform)) 条不符合约定式提交"
-  fi
+if compgen -G "$repo/.github/workflows/*.y*ml" >/dev/null; then
+  ok 'R7 存在 CI 工作流'
+else
+  bad 'R7 无 .github/workflows/ 工作流'
 fi
 
-printf '\n-- 结果：必需项 %s，推荐项 %s\n' \
-  "$([[ $fails -eq 0 ]] && echo 全部通过 || echo "$fails 项未通过")" \
-  "$([[ $warns -eq 0 ]] && echo 全部通过 || echo "$warns 项待补")"
+# ---------------------------------------------------------------------------
+# R8 tests/
+# ---------------------------------------------------------------------------
+if [[ -d $repo/tests ]] && compgen -G "$repo/tests/*" >/dev/null; then
+  ok 'R8 存在 tests/'
+else
+  bad 'R8 无 tests/'
+fi
+
+printf '\n-- 结果：%s\n' \
+  "$([[ $fails -eq 0 ]] && echo 全部通过 || echo "$fails 项未通过")"
 ((fails == 0)) && exit 0 || exit 1
