@@ -9,7 +9,7 @@
 一个合规的仓库满足五件事：
 
 1. 根目录有非空的 `LICENSE`。
-2. `README.md` 是固定六段：`# 自然语言项目名` + 简介、功能（或工作原理）、安装、用法、文档、许可；英文文档对应 `Features` / `How it works`、`Installation`、`Usage`、`Documentation`、`License`。标题语言随正文语言，顺序不可乱，许可一节收尾。
+2. `README.md` 是固定六段：`# 自然语言项目名` + 简介、功能或原理、安装、用法、文档、许可；英文文档对应 `Features` / `How it works`、`Installation`、`Usage`、`Documentation`、`License`。标题语言随正文语言，顺序不可乱，许可一节收尾。
 3. README 代码块里出现的脚本路径真实存在，作为命令出现的 `.sh` 有可执行位。
 4. `docs/` 里的文件名是小写 kebab-case，交接文档叫 `docs/handoff.md`。
 5. 构建产物不进 git，工作区里的产物也必须在 `.gitignore` 覆盖范围内。
@@ -48,12 +48,14 @@
 | 节 | 中文文档 | 英文文档 |
 |---|---|---|
 | 1 | `# 自然语言项目名` + 一段不带小标题的简介 | 同左 |
-| 2 | `功能` 或 `工作原理` | `Features` 或 `How it works` |
+| 2 | `功能` 或 `原理` | `Features` 或 `How it works` |
 | 3 | `安装` | `Installation`（不用 `Install`） |
-| 4 | `用法` 或 `快速开始` | `Usage` / `Quick start` / `Getting Started` |
+| 4 | `用法` | `Usage` |
 | 5 | `文档` | `Documentation` |
 | 6 | `许可` | `License`，必须是最后一节 |
 | 可选 | `贡献` / `社区` | `Contributing` / `Community` |
+
+- **标题只认这几个词**：中文是「功能／原理、安装、用法、文档、许可」，英文是上表右列。既然要固定骨架，就不留同义变体——`工作原理`、`快速开始`、`Getting Started` 都不算命中，检查器会报缺节。
 
 - **为什么是 `Installation` 而不是 `Install`**：这一列标题都是名词（Features、Usage、Documentation、License），`Install` 是祈使动词，混在名词序列里不一致；它该出现的位置是命令本身。检查器接受 `Install`，但会提示改成 `Installation`。
 - **为什么标题语言必须跟随正文**：中文正文配英文标题，读一句话要中途切换语码，跨仓库检索也按语言分裂。规则不是「英文更专业」，而是「一份文档只用一种标题语言」。检查器按正文汉字行占比（≥20%）判定语言，不匹配即失败。

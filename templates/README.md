@@ -36,4 +36,4 @@ cd ~/Projects/<新仓库名>
 
 两个模板都不含 `.github/`：CI 工作流属于推荐层（W1），按项目需要再加。
 
-README 骨架里的 `# {{项目名}}` 要换成**自然语言名字**（「TUI 键盘恢复」），不是仓库 slug；二级标题语言跟随正文——中文正文用 `工作原理`／`安装`／`用法`／`文档`／`许可`，英文正文用 `How it works`／`Installation`／`Usage`／`Documentation`／`License`。
+README 骨架里的 `# {{项目名}}` 要换成**自然语言名字**（「TUI 键盘恢复」），不是仓库 slug；二级标题语言跟随正文——中文正文用 `原理`／`安装`／`用法`／`文档`／`许可`，英文正文用 `How it works`／`Installation`／`Usage`／`Documentation`／`License`，不留同义变体。

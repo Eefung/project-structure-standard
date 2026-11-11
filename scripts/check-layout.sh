@@ -93,20 +93,20 @@ else
   body_lines=$(grep -vE '^#{1,6}[[:space:]]' "$readme" | grep -c '[^[:space:]]' || true)
   if ((body_lines > 0 && cn_lines * 5 >= body_lines)); then
     doclang=cn
-    names=('功能|工作原理' '安装' '用法|快速开始' '文档' '许可')
-    res=('^(功能|工作原理)[[:space:]]*[:：]?$'
+    names=('功能|原理' '安装' '用法' '文档' '许可')
+    res=('^(功能|原理)[[:space:]]*[:：]?$'
          '^安装[[:space:]]*[:：]?$'
-         '^(用法|快速开始|开始使用)[[:space:]]*[:：]?$'
+         '^用法[[:space:]]*[:：]?$'
          '^文档[[:space:]]*[:：]?$'
          '^(许可|版权)[[:space:]]*[:：]?$')
     optional='^(贡献|社区|致谢)[[:space:]]*[:：]?$'
-    hint='中文正文应配中文标题：功能／工作原理、安装、用法、文档、许可'
+    hint='中文正文应配中文标题：功能或原理、安装、用法、文档、许可'
   else
     doclang=en
-    names=('Features|How it works' 'Installation' 'Usage|Quick start|Getting Started' 'Documentation' 'License')
+    names=('Features|How it works' 'Installation' 'Usage' 'Documentation' 'License')
     res=('^(features|how it works)[[:space:]]*[:：]?$'
          '^(installation|install)[[:space:]]*[:：]?$'
-         '^(usage|quick start|getting started)[[:space:]]*[:：]?$'
+         '^usage[[:space:]]*[:：]?$'
          '^documentation[[:space:]]*[:：]?$'
          '^licen[cs]e[[:space:]]*[:：]?$')
     optional='^(contributing|contributors|community|acknowledgements?)[[:space:]]*[:：]?$'

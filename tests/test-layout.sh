@@ -70,7 +70,7 @@ new_fixture_cn() {
 
 一个用来测布局检查器的中文 fixture。
 
-## 工作原理
+## 原理
 
 什么都不做。
 
@@ -203,10 +203,18 @@ d=$(new_fixture_cn cn-ok)
 run_case '中文文档用中文标题应通过' 0 '全部通过' "$d"
 
 d=$(new_fixture_cn cn-en-headings)
-sed -i -e 's/^## 工作原理$/## How it works/' -e 's/^## 安装$/## Installation/' \
+sed -i -e 's/^## 原理$/## How it works/' -e 's/^## 安装$/## Installation/' \
        -e 's/^## 用法$/## Usage/' -e 's/^## 文档$/## Documentation/' -e 's/^## 许可$/## License/' \
        "$d/README.md"
 run_case '中文正文配英文标题必须失败' 1 '中文标题' "$d"
+
+d=$(new_fixture_cn cn-verbose-heading)
+sed -i 's/^## 原理$/## 工作原理/' "$d/README.md"
+run_case '中文标题写「工作原理」必须失败' 1 '缺少小节' "$d"
+
+d=$(new_fixture_cn cn-quickstart)
+sed -i 's/^## 用法$/## 快速开始/' "$d/README.md"
+run_case '中文标题写「快速开始」必须失败' 1 '缺少小节' "$d"
 
 d=$(new_fixture en-cn-headings)
 sed -i -e 's/^## How it works$/## 工作原理/' -e 's/^## Installation$/## 安装/' \

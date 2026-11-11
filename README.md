@@ -2,7 +2,7 @@
 
 `~/Projects` 下的仓库每个都合理，放在一起却不一致：入口脚本叫 `install.sh` / `build.sh` / `PKGBUILD`，卸载有独立脚本也有 `--uninstall` 参数，交接文档一个在根目录一个在 `docs/`，`magpie-repo` 甚至没有 `LICENSE`。这个仓库（`project-structure-standard`）把靠记忆维持的一致性，变成可查、可检查的规则。
 
-## 工作原理
+## 原理
 
 规范分三层，只有「能用几十行 shell 判定」的规则才进必需层；每条必需规则都有对应的检查代码和一个 fixture 反例。
 
