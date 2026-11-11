@@ -19,8 +19,6 @@ git clone https://github.com/Eefung/project-structure-standard.git
 ## 用法
 
 ```sh
-cd project-structure-standard
-
 # 检查任意仓库（不传路径则查当前目录）
 scripts/check-layout.sh ~/Projects/tui-mode-recovery
 

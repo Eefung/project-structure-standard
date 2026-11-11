@@ -4,8 +4,7 @@
 
 ```sh
 cp -r templates/script-project ~/Projects/<新仓库名>
-cd ~/Projects/<新仓库名>
-# 把 {{...}} 占位全部替换掉，再 git init
+# 进到新仓库：替换 {{...}} 占位，git init，跑检查器
 ```
 
 复制完在仓库根跑一次检查器，应当直接全绿：
