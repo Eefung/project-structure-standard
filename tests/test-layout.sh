@@ -24,25 +24,29 @@ new_fixture() {
   cat >"$dir/README.md" <<'MD'
 # fixture
 
-## 问题
+演示用 fixture：说明它解决什么问题。
 
-演示用 fixture。
-
-## 做法
+## How it works
 
 什么都不做。
 
-## 用法
+## Install
 
 ```sh
 ./run.sh
 ```
 
-## 验证
+## Usage
 
-看完即通过。
+```sh
+./run.sh
+```
 
-## 许可
+## Documentation
+
+见 `docs/note.md`。
+
+## License
 
 MIT。
 MD
@@ -112,8 +116,29 @@ printf 'x' >"$d/payload.tar.xz"        # *.tar.xz 已被 .gitignore 覆盖
 run_case '已忽略的产物只告警，不阻塞' 0 '全部通过' "$d"
 
 d=$(new_fixture readme-sections)
-grep -v '^## 验证' "$d/README.md" >"$d/README.tmp" && mv "$d/README.tmp" "$d/README.md"
-run_case 'README 缺验证小节必须失败' 1 '验证' "$d"
+grep -v '^## Documentation' "$d/README.md" >"$d/README.tmp" && mv "$d/README.tmp" "$d/README.md"
+run_case '缺 Documentation 小节必须失败' 1 'Documentation' "$d"
+
+d=$(new_fixture no-h1)
+sed '1d' "$d/README.md" >"$d/README.tmp" && mv "$d/README.tmp" "$d/README.md"
+run_case '缺一级标题必须失败' 1 '一级标题' "$d"
+
+d=$(new_fixture no-overview)
+grep -v '^演示用 fixture' "$d/README.md" >"$d/README.tmp" && mv "$d/README.tmp" "$d/README.md"
+run_case 'H1 下无简介必须失败' 1 '简介' "$d"
+
+d=$(new_fixture bad-order)
+sed -e 's/^## Install$/## SWAP/' -e 's/^## Usage$/## Install/' -e 's/^## SWAP$/## Usage/' \
+    "$d/README.md" >"$d/README.tmp" && mv "$d/README.tmp" "$d/README.md"
+run_case '章节顺序错乱必须失败' 1 '顺序' "$d"
+
+d=$(new_fixture license-not-last)
+printf '\n## Appendix\n\n附录。\n' >>"$d/README.md"
+run_case 'License 之后还有小节必须失败' 1 '最后一节' "$d"
+
+d=$(new_fixture extra-section)
+sed -i '/^## License/i ## Troubleshooting\n\n排障。\n' "$d/README.md"
+run_case '规范外的二级标题只告警，不阻塞' 0 '全部通过' "$d"
 
 d=$(new_fixture nested-handoff)
 mkdir -p "$d/templates/thing/docs"

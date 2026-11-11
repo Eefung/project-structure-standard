@@ -57,7 +57,7 @@
 **本次研究的具体目标**：
 
 1. 产出一份分层目录规范（必需 / 推荐 / 按需），覆盖三种项目形态：脚本工具类、Arch 打包类、仓库/发布类。
-2. 统一入口命名与 README 骨架（问题 → 做法 → 用法 → 验证 → 已验证环境 → 许可），与现有四份 README 的实际写法兼容。
+2. 统一 README 骨架为固定六段（`# 项目名` + 简介 → `Features` 或 `How it works` → `Install` 或 `Installation` → `Usage` / `Quick start` / `Getting Started` → `Documentation` → `License`，顺序固定、`License` 收尾），正文语言不限。
 3. 统一元数据：`LICENSE` 必需、`docs/` 文件名一律小写 kebab-case、交接类文档固定在 `docs/handoff.md`。
 4. 定义构建产物与工作目录的落位规则，明确「仓库根只放源码与元数据」。
 5. 提供可执行的检查器：对任一仓库运行，输出必需项缺失清单，缺失时退出码非 0，可直接接进 CI。

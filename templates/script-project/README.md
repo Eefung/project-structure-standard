@@ -2,11 +2,7 @@
 
 {{一句话：它解决什么问题，谁用。}}
 
-## 问题
-
-{{什么情况下会痛。贴真实症状——报错原文、失效的组合键、多花的十分钟。不要写「效率不高」这类空话。}}
-
-## 做法
+## How it works
 
 {{一段话说清它怎么做的。必要时列组件：}}
 
@@ -17,25 +13,29 @@
 | `tests/run-tests.sh` | 回归测试 |
 | `docs/handoff.md` | 交接文档：当前状态、未决事项、复现方法 |
 
-## 用法
+## Install
 
 ```sh
-./install.sh              # 安装到 ~/.local/bin
-./install.sh --check      # 校验已装副本与仓库一致
+./install.sh
+```
+
+装到 `~/.local/bin`（若设了 `XDG_BIN_HOME` 则装到那里），不需要 sudo。确认该目录在 `PATH` 里。重复执行安全。
+
+## Usage
+
+```sh
+./install.sh --check      # 校验已装副本与仓库一致，不一致返回 1
 ./install.sh --uninstall  # 只删本项目装的文件
+example                   # 跑起来（换成真实入口名）
 ```
 
-## 验证
+在 {{发行版与内核，如 CachyOS / Linux 7.3.3-1-cachyos}}、{{shell，如 bash 5.x}} 上已验证。
 
-```sh
-tests/run-tests.sh
-```
+## Documentation
 
-### 已验证环境
+- [`docs/handoff.md`](docs/handoff.md) — 交接文档：当前状态、未决事项、复现方法
+- `tests/run-tests.sh` — 回归测试，覆盖安装、校验、卸载闭环
 
-- {{发行版与内核版本，如 CachyOS / Linux 7.3.3-1-cachyos}}
-- {{shell 与版本，如 fish 4.x / bash 5.x}}
-
-## 许可
+## License
 
 MIT，见 [LICENSE](LICENSE)。

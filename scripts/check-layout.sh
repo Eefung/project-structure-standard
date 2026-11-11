@@ -59,25 +59,83 @@ else
 fi
 
 # ---------------------------------------------------------------------------
-# R2 README 五段结构
+# R2 README 六段结构：H1+简介 → Features|How it works → Install|Installation
+#    → Usage|Quick start|Getting Started → Documentation → License
 # ---------------------------------------------------------------------------
 readme=$repo/README.md
 if [[ ! -s $readme ]]; then
   bad 'R2 缺少 README.md'
 else
-  headings=$(grep -E '^#{1,3} ' "$readme" || true)
-  has_section() { grep -Eiq "^#{1,3} .*($1)" <<<"$headings"; }
-  missing=""
-  has_section '问题|为什么|背景|动机'          || missing+=" 问题"
-  has_section '做法|做什么|是什么|原理|方案|组件|怎么' || missing+=" 做法"
-  has_section '用法|安装|快速开始|使用|上手'    || missing+=" 用法"
-  has_section '验证|自检|验收|测试|诊断'        || missing+=" 验证"
-  has_section '许可|licen[cs]e|版权'            || missing+=" 许可"
-  if [[ -z $missing ]]; then
-    ok 'R2 README 具备 问题/做法/用法/验证/许可 五类小节'
+  first=$(grep -m1 -vE '^[[:space:]]*$' "$readme" || true)
+  if [[ $first =~ ^#[[:space:]]+[^#] ]]; then
+    ok 'R2 首行是一级标题'
   else
-    bad "R2 README 缺少小节:$missing（标题措辞不限，按关键词匹配）"
+    bad 'R2 首行不是一级标题（# 项目名）'
   fi
+
+  overview=$(awk '/^#[[:space:]]/{h1=1;next} h1 && /^##[[:space:]]/{exit} h1{print}' "$readme" \
+             | grep -c '[^[:space:]]' || true)
+  if ((overview > 0)); then
+    ok 'R2 一级标题下有简介'
+  else
+    bad 'R2 一级标题下没有简介文字（H1 与第一个二级标题之间）'
+  fi
+
+  mapfile -t h2 < <(grep -E '^##[[:space:]]' "$readme" \
+                    | sed -E 's/^##[[:space:]]+//; s/[[:space:]]+$//')
+  lc=()
+  for h in "${h2[@]}"; do lc+=("$(printf '%s' "$h" | tr '[:upper:]' '[:lower:]')"); done
+
+  idx_of() {
+    local re=$1 i
+    for ((i = 0; i < ${#lc[@]}; i++)); do
+      # shellcheck disable=SC2053
+      if [[ ${lc[$i]} =~ $re ]]; then printf '%s' "$i"; return 0; fi
+    done
+    return 1
+  }
+
+  names=('Features|How it works' 'Install|Installation' 'Usage|Quick start|Getting Started' 'Documentation' 'License')
+  res=('^(features|how it works)[[:space:]]*[:：]?$'
+       '^(install|installation)[[:space:]]*[:：]?$'
+       '^(usage|quick start|getting started)[[:space:]]*[:：]?$'
+       '^documentation[[:space:]]*[:：]?$'
+       '^licen[cs]e[[:space:]]*[:：]?$')
+
+  missing=""
+  order_bad=0
+  prev=-1
+  last=-1
+  for i in 0 1 2 3 4; do
+    if ! n=$(idx_of "${res[$i]}"); then
+      missing+=" ${names[$i]}"
+      continue
+    fi
+    ((n < prev)) && order_bad=1
+    prev=$n
+    last=$n
+  done
+
+  if [[ -n $missing ]]; then
+    bad "R2 README 缺少小节:$missing"
+  elif ((order_bad)); then
+    bad 'R2 二级标题顺序不对（应为 Features|How it works → Install → Usage → Documentation → License）'
+  elif ((last != ${#lc[@]} - 1)); then
+    bad "R2 License 必须是最后一节，其后还有：${h2[$((last + 1))]}"
+  else
+    ok 'R2 README 六段结构完整且顺序正确'
+  fi
+
+  extra=""
+  for i in "${!h2[@]}"; do
+    hit=0
+    for re in "${res[@]}" '^(contributing|contributors|community)[[:space:]]*[:：]?$'; do
+      # shellcheck disable=SC2053
+      [[ ${lc[$i]} =~ $re ]] && { hit=1; break; }
+    done
+    ((hit)) || extra+="${h2[$i]}、"
+  done
+  [[ -n $extra ]] && warn "R2 规范外的二级标题：${extra%、}（不计入失败，内容宜沉到 docs/）"
 fi
 
 # ---------------------------------------------------------------------------
@@ -211,12 +269,13 @@ else
 fi
 
 # ---------------------------------------------------------------------------
-# W2 已验证环境小节
+# W2 已验证环境（六段结构下没有独立小节，写在正文或 docs/ 里即可）
 # ---------------------------------------------------------------------------
-if [[ -s $readme ]] && grep -Eiq '^#{1,3} .*(已验证|环境要求|系统要求|依赖)' "$readme"; then
-  ok 'W2 README 记录了环境要求或已验证环境'
+if grep -Eiq '已验证|tested on|verified (on|with)|环境要求' "$readme" 2>/dev/null \
+   || grep -rEiq '已验证|tested on|verified (on|with)' "$repo/docs" 2>/dev/null; then
+  ok 'W2 README 或 docs/ 记录了已验证环境'
 else
-  warn 'W2 README 未记录环境要求／已验证环境'
+  warn 'W2 README 与 docs/ 都未记录已验证环境'
 fi
 
 # ---------------------------------------------------------------------------
