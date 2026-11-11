@@ -4,48 +4,43 @@
 
 ## 原理
 
-规范分三层，只有「能用几十行 shell 判定」的规则才进必需层；每条必需规则都有对应的检查代码和一个 fixture 反例。
+规范是八条能用 shell 判定的结构事实：许可证在不在、README 六段齐不齐、文档命令能不能跑、目录名对不对、产物有没有入库、目录有没有登记、有没有 CI、有没有测试。检查器逐条比对仓库现状，每条打印 ✓ 或 ✗，任何一条 ✗ 就退出码 1——它只判合规与否，哪条先修是使用者的事。
 
-| 文件 | 内容 |
-|---|---|
-| [`docs/standard.md`](docs/standard.md) | 规范正文：8 条规则（R1–R8）、目录职责表、写作与提交约定 |
-| [`scripts/check-layout.sh`](scripts/check-layout.sh) | 检查器：对任一仓库运行，有规则不通过时退出码 1 |
-| [`tests/test-layout.sh`](tests/test-layout.sh) | 检查器自身的回归测试，用临时 fixture 覆盖每条必需规则 |
-| [`templates/`](templates/README.md) | 两个骨架：`script-project/`（脚本工具）、`pkgbuild-project/`（Arch 打包） |
-| [`docs/migration.md`](docs/migration.md) | 逐仓库迁移清单与进度 |
-| [`docs/proposal.md`](docs/proposal.md) | 需求提案：现状盘点、目标、方法、交付物与验收标准 |
+检查器自己也有回归测试：每条规则配一个故意违规的临时仓库，规则放松或收紧都会让用例失败。规范、检查器、测试在同一次提交里改；CI 每次 push 跑回归测试、本仓库自查和两个模板自查，规范才不会在没人注意时漂移。
 
 ## 安装
 
 ```sh
-git clone https://github.com/Eefung/project-structure-standard.git ~/Projects/project-structure-standard
+git clone https://github.com/Eefung/project-structure-standard.git
 ```
 
-无依赖：bash 4+、git、GNU coreutils。没有安装步骤，克隆完直接跑检查器。
+依赖：bash 4+、git、GNU coreutils。没有构建步骤。
 
 ## 用法
 
 ```sh
-# 检查任意仓库（默认当前目录）
+cd project-structure-standard
+
+# 检查任意仓库（不传路径则查当前目录）
 scripts/check-layout.sh ~/Projects/tui-mode-recovery
 
-# 只关心失败项
+# 只输出不合规项
 scripts/check-layout.sh --quiet .
 
 # 检查器自身的回归测试
 tests/test-layout.sh
 ```
 
-退出码：0 全部合规；1 有规则不合规；2 用法错误。`✓` 合规、`✗` 不合规——规范不判轻重。
+退出码：0 全部合规；1 有规则不合规；2 用法错误。
 
 在 CachyOS（Linux 7.3.3-1-cachyos）、bash 5.x 上已验证，`shellcheck -S warning` 无告警；`tests/test-layout.sh` 27 个用例全过；本仓库与两个模板自查均 exit=0。
 
 ## 文档
 
-- [`docs/standard.md`](docs/standard.md) — 规则正文：判定条件、为什么、违反后果
-- [`docs/migration.md`](docs/migration.md) — 四个存量仓库怎么改，逐仓库命令与预期输出
-- [`templates/README.md`](templates/README.md) — 新仓库从哪个骨架起手
-- [`docs/proposal.md`](docs/proposal.md) — 需求提案与验收标准
+- [`docs/standard.md`](docs/standard.md) — 八条规则：判定条件、为什么、违反后果
+- [`docs/migration.md`](docs/migration.md) — 四个存量仓库逐条怎么改，含每个仓库的标题对照表
+- [`docs/proposal.md`](docs/proposal.md) — 需求提案：现状盘点、目标、方法与验收标准
+- [`templates/README.md`](templates/README.md) — 两个骨架给了什么、怎么复制
 
 ## 许可
 

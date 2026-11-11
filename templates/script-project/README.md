@@ -4,14 +4,7 @@
 
 ## 原理
 
-{{一段话说清它怎么做的。必要时列组件：}}
-
-| 文件 | 职责 |
-|---|---|
-| `install.sh` | 安装、`--check` 校验已装副本、`--uninstall` 卸载 |
-| `bin/example` | 用户直接运行的入口 |
-| `tests/run-tests.sh` | 回归测试 |
-| `docs/handoff.md` | 交接文档：当前状态、未决事项、复现方法 |
+`install.sh` 把 `bin/example` 装到 `~/.local/bin`，`--check` 逐字节比对已装副本与仓库是否一致，`--uninstall` 只删带本项目标记的文件。`tests/run-tests.sh` 断言这条闭环：入口可执行、安装落地、校验认可、校验能检出漂移、卸载干净。
 
 ## 安装
 
@@ -34,7 +27,6 @@ example                   # 跑起来（换成真实入口名）
 ## 文档
 
 - [`docs/handoff.md`](docs/handoff.md) — 交接文档：当前状态、未决事项、复现方法
-- `tests/run-tests.sh` — 回归测试，覆盖安装、校验、卸载闭环
 
 ## 许可
 

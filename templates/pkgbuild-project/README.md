@@ -4,14 +4,13 @@
 
 ## 原理
 
-`PKGBUILD` 从 {{上游来源，如 Arch 官方包}} 派生，只改 {{具体改了哪几处}}。入口是 `build.sh`，它只是把 `makepkg` 的参数透传下去。
+`PKGBUILD` 从 {{上游来源，如 Arch 官方包}} 派生，只改 {{具体改了哪几处}}。`build.sh` 只是 `makepkg -si` 的薄封装，参数原样透传；`tests/smoke.sh` 断言 PKGBUILD 能被 bash 解析、`pkgname` / `pkgver` / `arch` / `license` 齐全、`source` 与 `sha256sums` 数量一致。
 
 | 文件 | 职责 |
 |---|---|
 | `PKGBUILD` | 打包定义；makepkg 要求它在仓库根 |
 | `build.sh` | `makepkg -si` 的薄封装，统一入口 |
 | `*.patch` | 对上游源码的补丁 |
-| `docs/` | 长文档：原理、故障排查（出现时再建） |
 
 ## 安装
 
@@ -33,7 +32,7 @@ pacman -Qi {{包名}}        # 确认装的是本仓库的包
 
 ## 文档
 
-打包逻辑集中在 `PKGBUILD` 的注释里；专题说明（原理、故障排查）出现时放 `docs/`，用 `docs/handoff.md` 交接。
+暂无独立文档：打包逻辑写在 `PKGBUILD` 的注释里。出现原理说明或故障排查时放 `docs/`，交接文档写到 `docs/handoff.md`（出现时新建）。
 
 ## 许可
 
