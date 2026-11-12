@@ -9,8 +9,6 @@ git clone https://github.com/Eefung/project-structure-standard.git
 cp -r skills/repo-layout-convention <技能目录>
 ```
 
-依赖 bash 4+、git、coreutils。
-
 ## 用法
 
 ```sh
@@ -18,7 +16,7 @@ scripts/check-layout.sh <仓库>
 scripts/check-layout.sh -q <仓库>
 ```
 
-退出码 0／1／2：通过／有不通过项／用法错。CachyOS、bash 5.x 验证。
+退出码 0／1／2：通过／有不通过项／用法错。
 
 ## 开发
 
