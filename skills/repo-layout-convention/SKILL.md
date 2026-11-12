@@ -1,7 +1,7 @@
 ---
 name: repo-layout-convention
 description: "Use when auditing or defining repo layout standards."
-version: 3.8.1
+version: 3.9.0
 author: Hermes Agent
 license: MIT
 metadata:
@@ -46,7 +46,7 @@ scripts/check-layout.sh -q <仓库>   # 只看 ✗
 ## 约定
 
 - 各节不重复：`原理` 讲机制，`安装` 给命令，`问题` 收问答，`文档` 做索引，`参考` 列材料。
-- `问题` 每题加粗独占一段，答案另起一段。
+- `问题` 每题三级标题，答案另起一段。
 - `许可` 写「许可证名，见 [`LICENSE`](LICENSE)」。
 - 只写执行所需，不写教学铺陈；安装不发明落地路径，用法不带 `cd`。
 - 中文正文全角标点；提交 `type: 中文描述`，分条列点，末附验证环境行。
