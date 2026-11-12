@@ -4,10 +4,10 @@
 
 ```sh
 cp -r templates/script-project ~/Projects/<新仓库名>
-# 进到新仓库：替换 {{...}} 占位，git init，跑检查器
+# 替换 {{...}} 占位，删掉用不到的节，git init，再跑检查器
 ```
 
-复制完在仓库根跑一次检查器，应当直接全绿：
+复制完在仓库根跑一次检查器，应当全绿：
 
 ```sh
 ~/Projects/project-structure-standard/scripts/check-layout.sh .
@@ -22,17 +22,13 @@ cp -r templates/script-project ~/Projects/<新仓库名>
 
 - `install.sh`：装到 `~/.local/bin`（尊重 `XDG_BIN_HOME`），重复执行安全，`--check` 比较已装副本、`--uninstall` 只删自己装的文件。
 - `bin/example`：入口占位，换成真实现。
-- `tests/run-tests.sh`：五个断言覆盖「入口可执行 / 安装落地 / --check 认可 / --check 检出漂移 / 卸载干净」。
-- `docs/handoff.md`：交接骨架，按「当前状态 / 怎么做 / 未决事项 / 复现方法」组织。
-- `README.md`：六段骨架（项目名 + 简介 / 工作原理 / 安装 / 用法 / 文档 / 许可），占位写成 `{{...}}`。
+- `README.md`：首节 + `原理`／`安装`／`用法`／`许可`，占位写成 `{{...}}`。
 
 ## pkgbuild-project 给了什么
 
 - `PKGBUILD`：`make`/`install` 骨架，`sha256sums` 留成 `SKIP` 并在注释里写了换成 `updpkgsums` 的时机。
 - `build.sh`：`makepkg -si` 的薄封装，参数原样透传。
-- `.gitignore`：直接覆盖 `src/`、`pkg/`、`*.pkg.tar.zst`、源码包——这是 R5 最容易踩的一条。
-- `README.md`：六段骨架，用法里给出 `./build.sh` 与清工作目录的 `makepkg -sc`。
+- `.gitignore`：覆盖 `src/`、`pkg/`、`*.pkg.tar.zst` 与源码包——产物入库是检查器唯一直接报错的硬伤。
+- `README.md`：首节 + `原理`／`安装`／`用法`／`许可`。
 
-两个模板都自带 `.github/workflows/ci.yml`（shellcheck + 各自回归测试），也都有 `tests/`：起手即满足 R7、R8。
-
-README 骨架里的 `# {{项目名}}` 要换成**自然语言名字**（「TUI 键盘恢复」），不是仓库 slug；二级标题语言跟随正文——中文正文用 `原理`／`安装`／`用法`／`文档`／`许可`，英文正文用 `How it works`／`Installation`／`Usage`／`Documentation`／`License`，不留同义变体。
+两个模板都不带 `tests/` 与 CI：要不要测试由项目自己定。`# {{项目名}}` 要换成自然语言名字（「TUI 键盘恢复」），不是仓库 slug；标题语言跟随正文——中文正文用 `原理`／`安装`／`用法`／`文档`／`许可`，英文正文用 `How it works`／`Installation`／`Usage`／`Documentation`／`License`，不留同义变体。
