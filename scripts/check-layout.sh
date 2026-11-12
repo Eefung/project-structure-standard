@@ -22,7 +22,7 @@ set -uo pipefail
 
 QUIET=0
 repo_arg=""
-usage() { sed -n '3,17p' "$0" | sed 's/^# \{0,1\}//'; }
+usage() { sed -n '3,19p' "$0" | sed 's/^# \{0,1\}//'; }
 
 while (($#)); do
   case "$1" in
