@@ -1,7 +1,7 @@
 ---
 name: repo-layout-convention
 description: "Use when auditing or defining repo layout standards."
-version: 3.4.0
+version: 3.5.0
 author: Hermes Agent
 license: MIT
 metadata:
@@ -13,14 +13,9 @@ metadata:
 
 # 项目结构规范
 
-检查器判词与序，agent 判该不该有。本文件是唯一定义，位于 `github.com/Eefung/project-structure-standard/skills/repo-layout-convention/`；检查器在仓库 `scripts/check-layout.sh`。判仓库、写或迁移 README、改规范都用它。
+检查器判词与序，agent 判该不该有。本文件是唯一定义，位于 `github.com/Eefung/project-structure-standard/skills/repo-layout-convention/`；检查器在仓库 `scripts/check-layout.sh`。
 
 ## 原理
-
-```sh
-scripts/check-layout.sh <仓库>      # 0 通过／1 有不通过项／2 用法错
-scripts/check-layout.sh -q <仓库>   # 只看 ✗
-```
 
 | # | 判定 |
 |---|---|
@@ -36,7 +31,17 @@ scripts/check-layout.sh -q <仓库>   # 只看 ✗
 
 判断项（脚本不判）：`LICENSE` 公开仓库要有，`许可` 写「未授权」也可；某节、`docs/`、`tests/`、CI 没有不算缺点，有就得能跑；词表外小节能沉 `docs/` 就沉，确有必要就放行，放在该节后、`许可` 前。规范治两种叫法，不管项目该有什么。
 
-做法：`-q` 结果逐条过判断项；改规则同一次提交改本文件与 `scripts/check-layout.sh`，改完在真实仓库跑一遍；起新仓库 `cp -r templates/script-project <新仓库>`，替换 `{{...}}`，`git init`，跑检查器。
+## 用法
+
+```sh
+scripts/check-layout.sh <仓库>      # 0 通过／1 有不通过项／2 用法错
+scripts/check-layout.sh -q <仓库>   # 只看 ✗
+```
+
+- 判仓库：`-q` 结果逐条过判断项。
+- 写或迁移 README：按词表与顺序排节，用不到的节删掉。
+- 改规则：同一次提交改本文件与 `scripts/check-layout.sh`，改完在真实仓库跑一遍。
+- 起新仓库：`cp -r templates/script-project <新仓库>`，替换 `{{...}}`，`git init`，跑检查器。
 
 ## 约定
 
