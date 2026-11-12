@@ -16,7 +16,7 @@ scripts/check-layout.sh <仓库>
 scripts/check-layout.sh -q <仓库>
 ```
 
-退出码 0／1／2：通过／有不通过项／用法错。
+退出码：0 通过，1 有不通过项，2 用法错。
 
 ## 开发
 
