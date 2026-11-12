@@ -1,34 +1,16 @@
 # 模板
 
-两个骨架，各对应一种项目形态。用法是复制，不是 submodule：
+两个骨架，复制使用（不是 submodule）：
 
 ```sh
 cp -r templates/script-project ~/Projects/<新仓库名>
-# 替换 {{...}} 占位，删掉用不到的节，git init，再跑检查器
 ```
 
-复制完在仓库根跑一次检查器，应当全绿：
+| 模板 | 形态 | 入口 |
+|---|---|---|
+| `script-project/` | 脚本工具，装到 `~/.local/bin` | `install.sh`（`--check` / `--uninstall`） |
+| `pkgbuild-project/` | Arch 打包 | `build.sh` → `makepkg -si` |
 
-```sh
-~/Projects/project-structure-standard/scripts/check-layout.sh .
-```
+`script-project` 含 `install.sh`、入口占位 `bin/example`；`pkgbuild-project` 含 `PKGBUILD`（`sha256sums` 为 `SKIP`，注释写明何时换 `updpkgsums`）、`build.sh`、覆盖 `src/`／`pkg/`／产物与源码包的 `.gitignore`。两个都不带 `tests/` 与 CI。
 
-| 模板 | 形态 | 入口 | 何时用 |
-|---|---|---|---|
-| `script-project/` | 脚本工具 | `install.sh`（含 `--check` / `--uninstall`） | 装到 `~/.local/bin` 的小工具、shell 包装 |
-| `pkgbuild-project/` | Arch 打包 | `build.sh` → `makepkg -si` | 从上游源码或二进制打 pacman 包 |
-
-## script-project 给了什么
-
-- `install.sh`：装到 `~/.local/bin`（尊重 `XDG_BIN_HOME`），重复执行安全，`--check` 比较已装副本、`--uninstall` 只删自己装的文件。
-- `bin/example`：入口占位，换成真实现。
-- `README.md`：首节 + `原理`／`安装`／`用法`／`许可`，占位写成 `{{...}}`。
-
-## pkgbuild-project 给了什么
-
-- `PKGBUILD`：`make`/`install` 骨架，`sha256sums` 留成 `SKIP` 并在注释里写了换成 `updpkgsums` 的时机。
-- `build.sh`：`makepkg -si` 的薄封装，参数原样透传。
-- `.gitignore`：覆盖 `src/`、`pkg/`、`*.pkg.tar.zst` 与源码包——产物入库是检查器唯一直接报错的硬伤。
-- `README.md`：首节 + `原理`／`安装`／`用法`／`许可`。
-
-两个模板都不带 `tests/` 与 CI：要不要测试由项目自己定。`# {{项目名}}` 要换成自然语言名字（「TUI 键盘恢复」），不是仓库 slug；标题语言跟随正文——中文正文用 `原理`／`安装`／`用法`／`文档`／`许可`，英文正文用 `How it works`／`Installation`／`Usage`／`Documentation`／`License`，不留同义变体。
+复制后替换 `{{...}}`、删掉用不到的节、`git init`，在仓库根跑 `~/Projects/project-structure-standard/scripts/check-layout.sh .`。`# {{项目名}}` 换自然语言名字，不是仓库 slug；标题语言随正文。
