@@ -1,7 +1,7 @@
 ---
 name: repo-layout-convention
 description: "Use when auditing or defining repo layout standards."
-version: 3.5.0
+version: 3.6.0
 author: Hermes Agent
 license: MIT
 metadata:
@@ -27,7 +27,7 @@ metadata:
 | 6 | 代码块 `*.sh`／`*PKGBUILD` 须存在，根目录 `*.sh` 需 `+x` |
 | 7 | 产物不入库且被忽略，一级目录在词表内或 README 登记 |
 
-词表：`功能`|`原理`／`安装`／`用法`／`文档`／`许可`；英文 `Features`|`How it works`／`Installation`／`Usage`／`Documentation`／`License`；可选 `开发`／`贡献`／`社区`／`致谢`（`Development`／`Contributing`／`Community`／`Acknowledgements`）。首节与 `许可` 必填，中间四节可省略。一级目录：`bin lib functions tools scripts templates packages files docs tests skills src pkg build`。
+词表：`功能`|`原理`／`安装`／`用法`／`问题`／`文档`／`许可`；英文 `Features`|`How it works`／`Installation`／`Usage`／`FAQ`／`Documentation`／`License`；可选 `开发`／`贡献`／`社区`／`致谢`（`Development`／`Contributing`／`Community`／`Acknowledgements`）。首节与 `许可` 必填，中间四节可省略。一级目录：`bin lib functions tools scripts templates packages files docs tests skills src pkg build`。
 
 判断项（脚本不判）：`LICENSE` 公开仓库要有，`许可` 写「未授权」也可；某节、`docs/`、`tests/`、CI 没有不算缺点，有就得能跑；词表外小节能沉 `docs/` 就沉，确有必要就放行，放在该节后、`许可` 前。规范治两种叫法，不管项目该有什么。
 
@@ -45,7 +45,7 @@ scripts/check-layout.sh -q <仓库>   # 只看 ✗
 
 ## 约定
 
-- 各节不重复：`原理` 讲机制，`安装` 给命令，`文档` 做索引。
+- 各节不重复：`原理` 讲机制，`安装` 给命令，`问题` 收装完才会遇到的症状与对策，`文档` 做索引。
 - 只写执行所需，不写教学铺陈；安装不发明落地路径，用法不带 `cd`。
 - 中文正文全角标点；提交 `type: 中文描述`，分条列点，末附验证环境行。
 - 不加别名、不加「推荐」级、不放松词表、不扩到别的生态。
