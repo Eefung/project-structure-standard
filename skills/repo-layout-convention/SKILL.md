@@ -1,7 +1,7 @@
 ---
 name: repo-layout-convention
 description: "Use when auditing or defining repo layout standards."
-version: 3.3.0
+version: 3.4.0
 author: Hermes Agent
 license: MIT
 metadata:
@@ -13,13 +13,9 @@ metadata:
 
 # 项目结构规范
 
-检查器判词与序，agent 判该不该有。本文件是唯一定义，位于 `github.com/Eefung/project-structure-standard/skills/repo-layout-convention/`；检查器在仓库 `scripts/check-layout.sh`。
+检查器判词与序，agent 判该不该有。本文件是唯一定义，位于 `github.com/Eefung/project-structure-standard/skills/repo-layout-convention/`；检查器在仓库 `scripts/check-layout.sh`。判仓库、写或迁移 README、改规范都用它。
 
-## 何时用（When to Use）
-
-判仓库合不合规；写或迁移 README；改规范。
-
-## 机械项
+## 原理
 
 ```sh
 scripts/check-layout.sh <仓库>      # 0 通过／1 有不通过项／2 用法错
@@ -38,26 +34,13 @@ scripts/check-layout.sh -q <仓库>   # 只看 ✗
 
 词表：`功能`|`原理`／`安装`／`用法`／`文档`／`许可`；英文 `Features`|`How it works`／`Installation`／`Usage`／`Documentation`／`License`；可选 `开发`／`贡献`／`社区`／`致谢`（`Development`／`Contributing`／`Community`／`Acknowledgements`）。首节与 `许可` 必填，中间四节可省略。一级目录：`bin lib functions tools scripts templates packages files docs tests skills src pkg build`。
 
-## 判断项
+判断项（脚本不判）：`LICENSE` 公开仓库要有，`许可` 写「未授权」也可；某节、`docs/`、`tests/`、CI 没有不算缺点，有就得能跑；词表外小节能沉 `docs/` 就沉，确有必要就放行，放在该节后、`许可` 前。规范治两种叫法，不管项目该有什么。
 
-- `LICENSE`：公开仓库要有，`许可` 写「未授权」也可。
-- 某节、`docs/`、`tests/`、CI：没有不算缺点，有就得能跑。
-- 词表外小节：能沉 `docs/` 就沉，确有必要就放行，放在该节后、`许可` 前。
+做法：`-q` 结果逐条过判断项；改规则同一次提交改本文件与 `scripts/check-layout.sh`，改完在真实仓库跑一遍；起新仓库 `cp -r templates/script-project <新仓库>`，替换 `{{...}}`，`git init`，跑检查器。
 
-规范治两种叫法，不管项目该有什么。
-
-## 做法
-
-- 判仓库：`-q` 结果逐条过判断项。
-- 改规范：同一次提交改本文件与 `scripts/check-layout.sh`，改完在真实仓库跑一遍。
-- 起新仓库：`cp -r templates/script-project <新仓库>`，替换 `{{...}}`，`git init`，跑检查器。
-
-## 写作与提交约定
+## 约定
 
 - 各节不重复：`原理` 讲机制，`安装` 给命令，`文档` 做索引。
 - 只写执行所需，不写教学铺陈；安装不发明落地路径，用法不带 `cd`。
 - 中文正文全角标点；提交 `type: 中文描述`，分条列点，末附验证环境行。
-
-## 不要做的事
-
-不加别名、不加「推荐」级、不放松词表、不扩到别的生态。
+- 不加别名、不加「推荐」级、不放松词表、不扩到别的生态。
