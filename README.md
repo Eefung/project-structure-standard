@@ -37,6 +37,7 @@ tests/test-layout.sh
 
 - [`docs/standard.md`](docs/standard.md) — 八条规则：判定条件、为什么、违反后果
 - [`docs/migration.md`](docs/migration.md) — 四个存量仓库逐条怎么改，含每个仓库的标题对照表
+- [`docs/handoff.md`](docs/handoff.md) — 交接：当前状态、未决事项、复现方法
 - [`docs/proposal.md`](docs/proposal.md) — 需求提案：现状盘点、目标、方法与验收标准
 - [`templates/README.md`](templates/README.md) — 两个骨架给了什么、怎么复制
 
