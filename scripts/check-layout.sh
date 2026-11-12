@@ -90,14 +90,16 @@ if [[ -s $readme ]]; then
   if ((body_lines > 0 && cn_lines * 5 >= body_lines)); then
     res=('^(功能|原理)$' '^安装$' '^用法$' '^文档$' '^许可$')
     res_other=('^(features|how it works)$' '^installation$' '^usage$' '^documentation$' '^license$')
-    optional='^(贡献|社区|致谢)$'
+    optional='^(开发|贡献|社区|致谢)$'
     vocab='功能、原理、安装、用法、文档、许可'
+    optlist='开发、贡献、社区、致谢'
     hint='中文正文应配中文标题'
   else
     res=('^(features|how it works)$' '^installation$' '^usage$' '^documentation$' '^license$')
     res_other=('^(功能|原理)$' '^安装$' '^用法$' '^文档$' '^许可$')
-    optional='^(contributing|contributors|community|acknowledgements?)$'
+    optional='^(development|contributing|contributors|community|acknowledgements?)$'
     vocab='Features、How it works、Installation、Usage、Documentation、License'
+    optlist='Development、Contributing、Community、Acknowledgements'
     hint='英文正文应配英文标题'
   fi
 
@@ -155,7 +157,7 @@ if [[ -s $readme ]]; then
   fi
 
   [[ -n $other_lang ]] && bad "标题 标题语言与正文不一致：${other_lang%、}（$hint）"
-  [[ -n $unknown ]]    && bad "标题 规范外的二级标题：${unknown%、}（词表：$vocab）"
+  [[ -n $unknown ]]    && bad "标题 规范外的二级标题：${unknown%、}（词表：$vocab；可选：$optlist）"
 fi
 
 # ---------------------------------------------------------------------------

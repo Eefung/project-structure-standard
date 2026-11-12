@@ -52,7 +52,7 @@ scripts/check-layout.sh -q .                  # 只看不通过项
 | 4 | `用法` | `Usage` |
 | 5 | `文档` | `Documentation` |
 | 6 | `许可`（必填，且必须是最后一节） | `License` |
-| 可选 | `贡献`、`社区`、`致谢` | `Contributing`、`Community`、`Acknowledgements` |
+| 可选 | `开发`、`贡献`、`社区`、`致谢` | `Development`、`Contributing`、`Community`、`Acknowledgements` |
 
 一级目录词表：`bin lib functions tools scripts templates packages files docs tests skills src pkg build`。根目录放 `README.md`、`LICENSE`、`.gitignore`、`.github/`、`docs/`，加上项目入口。
 

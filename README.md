@@ -22,12 +22,6 @@ git clone https://github.com/Eefung/project-structure-standard.git
 cp -r skills/repo-layout-convention ~/.hermes/skills/
 ```
 
-如果是在改这份规范本身，用软链更省事：改仓库里的文件，技能立刻生效。
-
-```sh
-ln -sfn "$PWD/skills/repo-layout-convention" ~/.hermes/skills/repo-layout-convention
-```
-
 依赖：bash 4+、git、GNU coreutils。没有构建步骤。
 
 判断项那半要 agent 支持加载技能（SKILL.md 那一套）才能用；不支持技能的 agent 只能跑检查器，机械项照样查得出。
@@ -42,6 +36,16 @@ scripts/check-layout.sh -q .                           # 只看不通过项
 退出码：0 全部通过；1 有不通过项；2 用法错误。
 
 在 CachyOS（Linux 7.3.3-1-cachyos）、bash 5.x 上已验证，`shellcheck -S warning` 无告警。
+
+## 开发
+
+改这份规范本身时，用软链把技能挂到本机 agent 的技能目录，仓库里的文件改完即生效：
+
+```sh
+ln -sfn "$PWD/skills/repo-layout-convention" ~/.hermes/skills/repo-layout-convention
+```
+
+改词表或加一节，同一次提交改 `SKILL.md` 与 `scripts/check-layout.sh`，再到真实仓库上跑一遍检查器——这个仓库没有自动回归。
 
 ## 许可
 
