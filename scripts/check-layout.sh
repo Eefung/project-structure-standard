@@ -81,24 +81,24 @@ else
 fi
 
 # ---------------------------------------------------------------------------
-# 标题：二级标题用词与顺序。许可必填，中间四节可整节省略；
-#   出现的节按 功能/原理 → 安装 → 用法 → 问题 → 文档 → 许可 递增，许可在最后。
+# 标题：二级标题用词与顺序。许可必填，中间五节可整节省略；
+#   出现的节按 功能/原理 → 安装 → 用法 → 问题 → 文档 → 参考 → 许可 递增，许可在最后。
 # ---------------------------------------------------------------------------
 if [[ -s $readme ]]; then
   cn_lines=$(grep -vE '^#{1,6}[[:space:]]' "$readme" | grep -cP '\p{Han}' || true)
   body_lines=$(grep -vE '^#{1,6}[[:space:]]' "$readme" | grep -c '[^[:space:]]' || true)
   if ((body_lines > 0 && cn_lines * 5 >= body_lines)); then
-    res=('^(功能|原理)$' '^安装$' '^用法$' '^问题$' '^文档$' '^许可$')
-    res_other=('^(features|how it works)$' '^installation$' '^usage$' '^faq$' '^documentation$' '^license$')
+    res=('^(功能|原理)$' '^安装$' '^用法$' '^问题$' '^文档$' '^参考$' '^许可$')
+    res_other=('^(features|how it works)$' '^installation$' '^usage$' '^faq$' '^documentation$' '^references$' '^license$')
     optional='^(开发|贡献|社区|致谢)$'
-    vocab='功能、原理、安装、用法、问题、文档、许可'
+    vocab='功能、原理、安装、用法、问题、文档、参考、许可'
     optlist='开发、贡献、社区、致谢'
     hint='中文正文应配中文标题'
   else
-    res=('^(features|how it works)$' '^installation$' '^usage$' '^faq$' '^documentation$' '^license$')
-    res_other=('^(功能|原理)$' '^安装$' '^用法$' '^问题$' '^文档$' '^许可$')
+    res=('^(features|how it works)$' '^installation$' '^usage$' '^faq$' '^documentation$' '^references$' '^license$')
+    res_other=('^(功能|原理)$' '^安装$' '^用法$' '^问题$' '^文档$' '^参考$' '^许可$')
     optional='^(development|contributing|contributors|community|acknowledgements?)$'
-    vocab='Features、How it works、Installation、Usage、FAQ、Documentation、License'
+    vocab='Features、How it works、Installation、Usage、FAQ、Documentation、References、License'
     optlist='Development、Contributing、Community、Acknowledgements'
     hint='英文正文应配英文标题'
   fi
@@ -116,14 +116,14 @@ if [[ -s $readme ]]; then
   for i in "${!h2[@]}"; do
     h=$(norm "${h2[$i]}")
     slot=""
-    for s in 0 1 2 3 4 5; do
+    for s in 0 1 2 3 4 5 6; do
       # shellcheck disable=SC2053
       if [[ $h =~ ${res[$s]} ]]; then slot=$s; break; fi
     done
     if [[ -n $slot ]]; then
       ((slot <= prev)) && order_bad=1
       prev=$slot
-      if ((slot == 5)); then
+      if ((slot == 6)); then
         seen_license=1
         license_idx=$i
       fi
@@ -133,13 +133,13 @@ if [[ -s $readme ]]; then
     if [[ $h =~ $optional ]]; then continue; fi
 
     in_other=0
-    for s in 0 1 2 3 4 5; do
+    for s in 0 1 2 3 4 5 6; do
       # shellcheck disable=SC2053
       if [[ $h =~ ${res_other[$s]} ]]; then in_other=1; break; fi
     done
     if ((in_other)); then
       other_lang+="${h2[$i]}、"
-      ((s == 5)) && other_license=1
+      ((s == 6)) && other_license=1
     else
       unknown+="${h2[$i]}、"
     fi
@@ -149,7 +149,7 @@ if [[ -s $readme ]]; then
     # 许可 写成了另一语言的词，语言不一致那条已经说明问题，不再重复报缺节
     ((other_license)) || bad "标题 缺少 许可 一节（词表：$vocab）"
   elif ((order_bad)); then
-    bad '标题 二级标题顺序不对（应为 功能/原理 → 安装 → 用法 → 问题 → 文档 → 许可，每节只出现一次）'
+    bad '标题 二级标题顺序不对（应为 功能/原理 → 安装 → 用法 → 问题 → 文档 → 参考 → 许可，每节只出现一次）'
   elif ((license_idx != ${#h2[@]} - 1)); then
     bad "标题 许可 必须是最后一个二级标题，其后还有：${h2[$((license_idx + 1))]}"
   else
