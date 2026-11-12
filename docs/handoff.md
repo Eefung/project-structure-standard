@@ -7,7 +7,7 @@
 | 项 | 值 |
 |---|---|
 | 仓库 | `github.com/Eefung/project-structure-standard`（public，默认分支 `main`） |
-| 本地 HEAD | `583026c`（`docs: 用法里去掉多余的 cd`） |
+| 本地 HEAD | `e7b6584`（`docs: 新增交接文档`，即本文件所在提交） |
 | 规则 | 8 条，`R1`–`R8`，见 `docs/standard.md` |
 | 检查器 | `scripts/check-layout.sh`：只有 `✓`／`✗`，任一 `✗` 退出码 1，不判轻重 |
 | 回归测试 | `tests/test-layout.sh`：27 个用例，全过 |
