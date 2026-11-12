@@ -15,7 +15,7 @@ metadata:
 
 自有仓库之间的一致性靠两样东西：一个 shell 检查器管机械项（词与序），一个 agent 管判断项（该不该有）。本文件是规范的唯一定义；检查器是它的机械项实现。
 
-仓库：`~/Projects/project-structure-standard`（`github.com/Eefung/project-structure-standard`），本文件位于该仓库 `skills/repo-layout-convention/`。
+仓库：`~/Projects/project-structure-standard`（`github.com/Eefung/project-structure-standard`），本文件位于该仓库 `skills/repo-layout-convention/`。检查器在同一仓库的 `scripts/check-layout.sh`——技能被复制到别的机器时，也要有那个仓库才能跑机械项，没有就先 clone。
 
 ## 何时用（When to Use）
 

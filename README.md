@@ -16,13 +16,21 @@
 git clone https://github.com/Eefung/project-structure-standard.git
 ```
 
-让本机 Hermes 读到仓库里的技能（软链，改技能就是改仓库）：
+技能目录是 `skills/repo-layout-convention/`，检查器在同一仓库的 `scripts/check-layout.sh`。把技能目录放进你所用的 agent 的技能目录即可——Hermes 是 `~/.hermes/skills/`，Claude Code 是 `~/.claude/skills/`，Codex／Copilot／Gemini 一类还认跨 runtime 的 `~/.agents/skills/`：
+
+```sh
+cp -r skills/repo-layout-convention ~/.hermes/skills/
+```
+
+如果是在改这份规范本身，用软链更省事：改仓库里的文件，技能立刻生效。
 
 ```sh
 ln -sfn "$PWD/skills/repo-layout-convention" ~/.hermes/skills/repo-layout-convention
 ```
 
 依赖：bash 4+、git、GNU coreutils。没有构建步骤。
+
+判断项那半要 agent 支持加载技能（SKILL.md 那一套）才能用；不支持技能的 agent 只能跑检查器，机械项照样查得出。
 
 ## 用法
 
